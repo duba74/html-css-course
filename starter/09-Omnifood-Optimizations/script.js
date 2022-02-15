@@ -12,31 +12,77 @@ btnNavEl.addEventListener("click", () => {
 });
 
 ///////////////////////////////////////////////////////////
-const allLinks = document.querySelectorAll("a:link");
-console.log(allLinks);
 
-allLinks.forEach((link) => {
-    link.addEventListener("click", (e) => {
-        e.preventDefault();
-        const href = link.getAttribute("href");
+// Smooth scrolling
 
-        // Scroll back to top
-        if (href === "#")
+// Using event delegation
+document.querySelector("body").addEventListener("click", (e) => {
+    e.preventDefault();
+    const link = e.target.closest("a")?.getAttribute("href");
+    if (link) {
+        if (link === "#") {
             window.scrollTo({
                 top: 0,
                 behavior: "smooth",
             });
+        } else {
+            if (link !== "#" && link.startsWith("#"))
+                document.querySelector(link).scrollIntoView({ behavior: "smooth" });
 
-        // Scroll to other links
-        if (href !== "#" && href.startsWith("#")) {
-            const sectionEl = document.querySelector(href);
-            sectionEl.scrollIntoView({ behavior: "smooth" });
+            if (e.target.classList.contains("main-nav-link")) headerEl.classList.toggle("nav-open");
         }
-
-        // Close mobile navigation
-        if (link.classList.contains("main-nav-link")) headerEl.classList.toggle("nav-open");
-    });
+    }
 });
+
+///////////////////////////////////////////////////////////
+// Sticky navigation
+
+const navHeight = headerEl.getBoundingClientRect().height;
+
+const sectionHeroEl = document.querySelector(".section-hero");
+
+const obs = new IntersectionObserver(
+    function (entries) {
+        const [ent] = entries;
+        console.log(ent);
+        if (!ent.isIntersecting) document.body.classList.add("sticky");
+        if (ent.isIntersecting) document.body.classList.remove("sticky");
+    },
+    {
+        // In the viewport
+        root: null,
+        threshold: 0,
+        rootMargin: `-${navHeight}px`,
+    }
+);
+obs.observe(sectionHeroEl);
+
+// Using loop to attach to all with href
+// const allLinks = document.querySelectorAll("a:link");
+// console.log(allLinks);
+
+// allLinks.forEach((link) => {
+//     link.addEventListener("click", (e) => {
+//         e.preventDefault();
+//         const href = link.getAttribute("href");
+
+//         // Scroll back to top
+//         if (href === "#")
+//             window.scrollTo({
+//                 top: 0,
+//                 behavior: "smooth",
+//             });
+
+//         // Scroll to other links
+//         if (href !== "#" && href.startsWith("#")) {
+//             const sectionEl = document.querySelector(href);
+//             sectionEl.scrollIntoView({ behavior: "smooth" });
+//         }
+
+//         // Close mobile navigation
+//         if (link.classList.contains("main-nav-link")) headerEl.classList.toggle("nav-open");
+//     });
+// });
 
 ///////////////////////////////////////////////////////////
 // Fixing flexbox gap property missing in some Safari versions
